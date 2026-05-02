@@ -1,0 +1,45 @@
+name: Build Loader+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.4'
+      - name: Build
+        run: gradle build -x test
+      - name: Create package
+        run: |
+          mkdir -p output/.minecraft/mods
+          mkdir -p output/.minecraft/internals
+          find build/libs -name "*.jar" ! -name "*-sources*" ! -name "*-dev*" -exec cp {} output/loaderplus.jar \;
+      - name: Download Sodium
+        run: curl -L -o output/.minecraft/internals/sodium.jar "https://cdn.modrinth.com/data/AANobbMI/versions/PkNEvmh5/sodium-fabric-0.5.3+mc1.20.1.jar"
+      - name: Download Iris
+        run: curl -L -o output/.minecraft/internals/iris.jar "https://cdn.modrinth.com/data/YL57xq9U/versions/NMcGAi1e/iris-1.6.17+mc1.20.1.jar"
+      - name: Download Lithium
+        run: curl -L -o output/.minecraft/internals/lithium.jar "https://cdn.modrinth.com/data/gvQqBUqZ/versions/ZSNsJrPI/lithium-fabric-mc1.20.1-0.11.2.jar"
+      - name: Download Krypton
+        run: curl -L -o output/.minecraft/internals/krypton.jar "https://cdn.modrinth.com/data/fQEb0iXm/versions/HW5moABR/krypton-0.2.3.jar"
+      - name: Download Connector
+        run: curl -L -o output/.minecraft/internals/connector.jar "https://cdn.modrinth.com/data/u58R1TMW/versions/1.0.0-beta.46%2B1.20.1/connector-1.0.0-beta.46+1.20.1.jar" || echo "Skipped"
+      - name: Download ModMenu
+        run: curl -L -o output/.minecraft/mods/modmenu.jar "https://cdn.modrinth.com/data/mOgUt4GM/versions/Lv9KUbgR/modmenu-7.2.2+1.20.1.jar"
+      - name: Download Fabric API
+        run: curl -L -o output/.minecraft/mods/fabric-api.jar "https://cdn.modrinth.com/data/P7dR8mSH/versions/Aqlf1aab/fabric-api-0.92.0+1.20.1.jar"
+      - name: Package
+        run: zip -r LoaderPlus-Complete.zip output/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LoaderPlus-Complete
+          path: LoaderPlus-Complete.zip
