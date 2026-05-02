@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "loaderplus",
+  "version": "1.0.0",
+  "name": "Loader+",
+  "description": "Next-generation Fabric-based mod loader.",
+  "authors": ["Adsky165"],
+  "license": "Apache-2.0",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["dev.loaderplus.core.LoaderPlusClient"],
+    "main": ["dev.loaderplus.core.LoaderPlusMain"]
+  },
+  "mixins": ["loaderplus.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "fabric-api": "*",
+    "minecraft": "1.20.1"
+  }
+}
